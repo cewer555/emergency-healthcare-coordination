@@ -1,0 +1,182 @@
+// use prisma-8
+
+model Hospital {
+  hospitalId       String   @id @default(uuid())
+  name             String
+  code             String   @unique
+  latitude         Float
+  longitude        Float
+  address          String?
+  status           String
+  emergencyContact String?
+  timezone         String
+  createdAt        TimestamptzString @default(now())
+  updatedAt        temporal.updatedAtString()
+
+  resources        HospitalResource[]
+  capabilities     HospitalCapability[]
+  requests         HospitalRequest[]
+  reservations     Reservation[]
+  destinationCases EmergencyCase[] @relation("DestinationHospital")
+}
+
+model HospitalResource {
+  resourceId   String   @id @default(uuid())
+  hospitalId   String
+  resourceType String
+  total        Int
+  available    Int
+  occupied     Int
+  reserved     Int
+  maintenance  Int
+  lastUpdated  TimestamptzString @default(now())
+  createdAt    TimestamptzString @default(now())
+  updatedAt    temporal.updatedAtString()
+
+  hospital     Hospital @relation(fields: [hospitalId], references: [hospitalId])
+}
+
+model HospitalCapability {
+  capabilityId   String   @id @default(uuid())
+  hospitalId     String
+  capabilityType String
+  enabled        Boolean
+  lastUpdated    TimestamptzString @default(now())
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+
+  hospital       Hospital @relation(fields: [hospitalId], references: [hospitalId])
+}
+
+model Patient {
+  patientId      String   @id @default(uuid())
+  name           String?
+  age            Int?
+  sex            String?
+  bloodGroup     String?
+  emergencyNotes String?
+  createdAt      TimestamptzString @default(now())
+  updatedAt      temporal.updatedAtString()
+
+  vitalReadings  VitalReading[]
+  emergencyCases EmergencyCase[]
+}
+
+model VitalReading {
+  vitalReadingId   String   @id @default(uuid())
+  patientId        String
+  heartRate        Int?
+  respiratoryRate  Int?
+  oxygenSaturation Float?
+  systolicBP       Int?
+  diastolicBP      Int?
+  temperature      Float?
+  consciousness    String?
+  recordedAt       TimestamptzString @default(now())
+  createdAt        TimestamptzString @default(now())
+
+  patient           Patient @relation(fields: [patientId], references: [patientId])
+}
+
+model Ambulance {
+  ambulanceId      String   @id @default(uuid())
+  registrationNo   String   @unique
+  status           String
+  latitude         Float?
+  longitude        Float?
+  crewDetails      String?
+  equipmentSummary String?
+  lastUpdated      TimestamptzString @default(now())
+  createdAt        TimestamptzString @default(now())
+  updatedAt        temporal.updatedAtString()
+
+  emergencyCases   EmergencyCase[]
+}
+
+model EmergencyCase {
+  emergencyCaseId       String   @id @default(uuid())
+  patientId             String
+  ambulanceId           String?
+  state                 String
+  priority              String
+  chiefComplaint        String?
+  requiredResources     String?
+  riskLevel             String?
+  currentLatitude       Float?
+  currentLongitude      Float?
+ destinationHospitalId String?
+
+destinationHospital Hospital? @relation(
+  "DestinationHospital",
+  fields: [destinationHospitalId],
+  references: [hospitalId]
+)
+  createdAt             TimestamptzString @default(now())
+  updatedAt             temporal.updatedAtString()
+
+  patient               Patient @relation(fields: [patientId], references: [patientId])
+  ambulance             Ambulance? @relation(fields: [ambulanceId], references: [ambulanceId])
+  hospitalRequests      HospitalRequest[]
+  reservations          Reservation[]
+  auditEvents           AuditEvent[]
+  modelInferences       ModelInference[]
+}
+
+model HospitalRequest {
+  hospitalRequestId  String   @id @default(uuid())
+  emergencyCaseId    String
+  hospitalId         String
+  requestedResources String?
+  status             String
+  requestedAt        TimestamptzString @default(now())
+  respondedAt        TimestamptzString?
+  rejectionReason    String?
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
+
+  emergencyCase      EmergencyCase @relation(fields: [emergencyCaseId], references: [emergencyCaseId])
+  hospital            Hospital @relation(fields: [hospitalId], references: [hospitalId])
+  reservation         Reservation?
+}
+
+model Reservation {
+  reservationId      String   @id @default(uuid())
+  emergencyCaseId   String
+  hospitalId        String
+  hospitalRequestId  String? @unique
+  status             String
+  reservedResources  String?
+  expiresAt          TimestamptzString?
+  createdAt          TimestamptzString @default(now())
+  updatedAt          temporal.updatedAtString()
+
+  emergencyCase      EmergencyCase @relation(fields: [emergencyCaseId], references: [emergencyCaseId])
+  hospital           Hospital @relation(fields: [hospitalId], references: [hospitalId])
+  hospitalRequest    HospitalRequest? @relation(fields: [hospitalRequestId], references: [hospitalRequestId])
+}
+
+model AuditEvent {
+  auditEventId   String   @id @default(uuid())
+  emergencyCaseId String?
+  eventType      String
+  actorType      String?
+  actorId        String?
+  details        String?
+  occurredAt     TimestamptzString @default(now())
+
+  emergencyCase  EmergencyCase? @relation(fields: [emergencyCaseId], references: [emergencyCaseId])
+}
+
+model ModelInference {
+  inferenceId     String   @id @default(uuid())
+  emergencyCaseId String?
+  modelName       String
+  modelVersion    String?
+  inputSummary    String?
+  outputSummary   String?
+  confidence      Float?
+  reasonCodes     String?
+  createdAt       TimestamptzString @default(now())
+
+  emergencyCase   EmergencyCase? @relation(fields: [emergencyCaseId], references: [emergencyCaseId])
+}
