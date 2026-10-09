@@ -1,0 +1,1588 @@
+[
+  {
+    "id": "schema.public",
+    "label": "Create schema \"public\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres"
+    },
+    "precheck": [],
+    "execute": [
+      {
+        "description": "Create schema \"public\"",
+        "sql": "CREATE SCHEMA IF NOT EXISTS \"public\"",
+        "params": []
+      }
+    ],
+    "postcheck": []
+  },
+  {
+    "id": "table.Ambulance",
+    "label": "Create table \"Ambulance\"",
+    "summary": "Creates table \"Ambulance\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Ambulance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Ambulance\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Ambulance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Ambulance\"",
+        "sql": "CREATE TABLE \"public\".\"Ambulance\" (\n  \"ambulanceId\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"crewDetails\" text,\n  \"equipmentSummary\" text,\n  \"lastUpdated\" timestamptz DEFAULT (now()) NOT NULL,\n  \"latitude\" float8,\n  \"longitude\" float8,\n  \"registrationNo\" text NOT NULL,\n  \"status\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"ambulanceId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Ambulance\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Ambulance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.AuditEvent",
+    "label": "Create table \"AuditEvent\"",
+    "summary": "Creates table \"AuditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "AuditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"AuditEvent\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AuditEvent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"AuditEvent\"",
+        "sql": "CREATE TABLE \"public\".\"AuditEvent\" (\n  \"actorId\" text,\n  \"actorType\" text,\n  \"auditEventId\" text NOT NULL,\n  \"details\" text,\n  \"emergencyCaseId\" text,\n  \"eventType\" text NOT NULL,\n  \"occurredAt\" timestamptz DEFAULT (now()) NOT NULL,\n  PRIMARY KEY (\"auditEventId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"AuditEvent\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AuditEvent\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.EmergencyCase",
+    "label": "Create table \"EmergencyCase\"",
+    "summary": "Creates table \"EmergencyCase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "EmergencyCase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"EmergencyCase\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"EmergencyCase\"",
+        "sql": "CREATE TABLE \"public\".\"EmergencyCase\" (\n  \"ambulanceId\" text,\n  \"chiefComplaint\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"currentLatitude\" float8,\n  \"currentLongitude\" float8,\n  \"destinationHospitalId\" text,\n  \"emergencyCaseId\" text NOT NULL,\n  \"patientId\" text NOT NULL,\n  \"priority\" text NOT NULL,\n  \"requiredResources\" text,\n  \"riskLevel\" text,\n  \"state\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"emergencyCaseId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"EmergencyCase\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Hospital",
+    "label": "Create table \"Hospital\"",
+    "summary": "Creates table \"Hospital\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Hospital"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Hospital\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Hospital\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Hospital\"",
+        "sql": "CREATE TABLE \"public\".\"Hospital\" (\n  \"address\" text,\n  \"code\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"emergencyContact\" text,\n  \"hospitalId\" text NOT NULL,\n  \"latitude\" float8 NOT NULL,\n  \"longitude\" float8 NOT NULL,\n  \"name\" text NOT NULL,\n  \"status\" text NOT NULL,\n  \"timezone\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"hospitalId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Hospital\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Hospital\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.HospitalCapability",
+    "label": "Create table \"HospitalCapability\"",
+    "summary": "Creates table \"HospitalCapability\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "HospitalCapability"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"HospitalCapability\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalCapability\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"HospitalCapability\"",
+        "sql": "CREATE TABLE \"public\".\"HospitalCapability\" (\n  \"capabilityId\" text NOT NULL,\n  \"capabilityType\" text NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"enabled\" bool NOT NULL,\n  \"hospitalId\" text NOT NULL,\n  \"lastUpdated\" timestamptz DEFAULT (now()) NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"capabilityId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"HospitalCapability\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalCapability\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.HospitalRequest",
+    "label": "Create table \"HospitalRequest\"",
+    "summary": "Creates table \"HospitalRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "HospitalRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"HospitalRequest\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalRequest\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"HospitalRequest\"",
+        "sql": "CREATE TABLE \"public\".\"HospitalRequest\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"emergencyCaseId\" text NOT NULL,\n  \"hospitalId\" text NOT NULL,\n  \"hospitalRequestId\" text NOT NULL,\n  \"rejectionReason\" text,\n  \"requestedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"requestedResources\" text,\n  \"respondedAt\" timestamptz,\n  \"status\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"hospitalRequestId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"HospitalRequest\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalRequest\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.HospitalResource",
+    "label": "Create table \"HospitalResource\"",
+    "summary": "Creates table \"HospitalResource\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "HospitalResource"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"HospitalResource\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalResource\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"HospitalResource\"",
+        "sql": "CREATE TABLE \"public\".\"HospitalResource\" (\n  \"available\" int4 NOT NULL,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"hospitalId\" text NOT NULL,\n  \"lastUpdated\" timestamptz DEFAULT (now()) NOT NULL,\n  \"maintenance\" int4 NOT NULL,\n  \"occupied\" int4 NOT NULL,\n  \"reserved\" int4 NOT NULL,\n  \"resourceId\" text NOT NULL,\n  \"resourceType\" text NOT NULL,\n  \"total\" int4 NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"resourceId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"HospitalResource\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalResource\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.ModelInference",
+    "label": "Create table \"ModelInference\"",
+    "summary": "Creates table \"ModelInference\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "ModelInference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"ModelInference\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ModelInference\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"ModelInference\"",
+        "sql": "CREATE TABLE \"public\".\"ModelInference\" (\n  \"confidence\" float8,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"emergencyCaseId\" text,\n  \"inferenceId\" text NOT NULL,\n  \"inputSummary\" text,\n  \"modelName\" text NOT NULL,\n  \"modelVersion\" text,\n  \"outputSummary\" text,\n  \"reasonCodes\" text,\n  PRIMARY KEY (\"inferenceId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"ModelInference\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ModelInference\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Patient",
+    "label": "Create table \"Patient\"",
+    "summary": "Creates table \"Patient\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Patient"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Patient\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Patient\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Patient\"",
+        "sql": "CREATE TABLE \"public\".\"Patient\" (\n  \"age\" int4,\n  \"bloodGroup\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"emergencyNotes\" text,\n  \"name\" text,\n  \"patientId\" text NOT NULL,\n  \"sex\" text,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"patientId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Patient\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Patient\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.Reservation",
+    "label": "Create table \"Reservation\"",
+    "summary": "Creates table \"Reservation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "Reservation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"Reservation\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"Reservation\"",
+        "sql": "CREATE TABLE \"public\".\"Reservation\" (\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"emergencyCaseId\" text NOT NULL,\n  \"expiresAt\" timestamptz,\n  \"hospitalId\" text NOT NULL,\n  \"hospitalRequestId\" text,\n  \"reservationId\" text NOT NULL,\n  \"reservedResources\" text,\n  \"status\" text NOT NULL,\n  \"updatedAt\" timestamptz NOT NULL,\n  PRIMARY KEY (\"reservationId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"Reservation\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "table.VitalReading",
+    "label": "Create table \"VitalReading\"",
+    "summary": "Creates table \"VitalReading\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "table",
+        "name": "VitalReading"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure table \"VitalReading\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VitalReading\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create table \"VitalReading\"",
+        "sql": "CREATE TABLE \"public\".\"VitalReading\" (\n  \"consciousness\" text,\n  \"createdAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"diastolicBP\" int4,\n  \"heartRate\" int4,\n  \"oxygenSaturation\" float8,\n  \"patientId\" text NOT NULL,\n  \"recordedAt\" timestamptz DEFAULT (now()) NOT NULL,\n  \"respiratoryRate\" int4,\n  \"systolicBP\" int4,\n  \"temperature\" float8,\n  \"vitalReadingId\" text NOT NULL,\n  PRIMARY KEY (\"vitalReadingId\")\n)",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify table \"VitalReading\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VitalReading\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Ambulance.Ambulance_registrationNo_key",
+    "label": "Add unique constraint on \"Ambulance\" (registrationNo)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Ambulance_registrationNo_key",
+        "table": "Ambulance"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Ambulance_registrationNo_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Ambulance_registrationNo_key",
+          "public",
+          "\"public\".\"Ambulance\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Ambulance_registrationNo_key\"",
+        "sql": "ALTER TABLE \"public\".\"Ambulance\" ADD CONSTRAINT \"Ambulance_registrationNo_key\" UNIQUE (\"registrationNo\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Ambulance_registrationNo_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Ambulance_registrationNo_key",
+          "public",
+          "\"public\".\"Ambulance\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Hospital.Hospital_code_key",
+    "label": "Add unique constraint on \"Hospital\" (code)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Hospital_code_key",
+        "table": "Hospital"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Hospital_code_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Hospital_code_key",
+          "public",
+          "\"public\".\"Hospital\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Hospital_code_key\"",
+        "sql": "ALTER TABLE \"public\".\"Hospital\" ADD CONSTRAINT \"Hospital_code_key\" UNIQUE (\"code\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Hospital_code_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Hospital_code_key",
+          "public",
+          "\"public\".\"Hospital\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unique.Reservation.Reservation_hospitalRequestId_key",
+    "label": "Add unique constraint on \"Reservation\" (hospitalRequestId)",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "unique",
+        "name": "Reservation_hospitalRequestId_key",
+        "table": "Reservation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure constraint \"Reservation_hospitalRequestId_key\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_hospitalRequestId_key",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add unique constraint \"Reservation_hospitalRequestId_key\"",
+        "sql": "ALTER TABLE \"public\".\"Reservation\" ADD CONSTRAINT \"Reservation_hospitalRequestId_key\" UNIQUE (\"hospitalRequestId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify constraint \"Reservation_hospitalRequestId_key\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_hospitalRequestId_key",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.AuditEvent.AuditEvent_emergencyCaseId_idx_1fa65c28",
+    "label": "Create index \"AuditEvent_emergencyCaseId_idx_1fa65c28\" on \"AuditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "AuditEvent_emergencyCaseId_idx_1fa65c28",
+        "table": "AuditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"AuditEvent_emergencyCaseId_idx_1fa65c28\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AuditEvent_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"AuditEvent_emergencyCaseId_idx_1fa65c28\"",
+        "sql": "CREATE INDEX \"AuditEvent_emergencyCaseId_idx_1fa65c28\" ON \"public\".\"AuditEvent\" (\"emergencyCaseId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"AuditEvent_emergencyCaseId_idx_1fa65c28\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"AuditEvent_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.EmergencyCase.EmergencyCase_ambulanceId_idx_77f531f9",
+    "label": "Create index \"EmergencyCase_ambulanceId_idx_77f531f9\" on \"EmergencyCase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "EmergencyCase_ambulanceId_idx_77f531f9",
+        "table": "EmergencyCase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"EmergencyCase_ambulanceId_idx_77f531f9\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase_ambulanceId_idx_77f531f9\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"EmergencyCase_ambulanceId_idx_77f531f9\"",
+        "sql": "CREATE INDEX \"EmergencyCase_ambulanceId_idx_77f531f9\" ON \"public\".\"EmergencyCase\" (\"ambulanceId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"EmergencyCase_ambulanceId_idx_77f531f9\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase_ambulanceId_idx_77f531f9\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.EmergencyCase.EmergencyCase_destinationHospitalId_idx_26134519",
+    "label": "Create index \"EmergencyCase_destinationHospitalId_idx_26134519\" on \"EmergencyCase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "EmergencyCase_destinationHospitalId_idx_26134519",
+        "table": "EmergencyCase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"EmergencyCase_destinationHospitalId_idx_26134519\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase_destinationHospitalId_idx_26134519\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"EmergencyCase_destinationHospitalId_idx_26134519\"",
+        "sql": "CREATE INDEX \"EmergencyCase_destinationHospitalId_idx_26134519\" ON \"public\".\"EmergencyCase\" (\"destinationHospitalId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"EmergencyCase_destinationHospitalId_idx_26134519\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase_destinationHospitalId_idx_26134519\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.EmergencyCase.EmergencyCase_patientId_idx_e5f07e88",
+    "label": "Create index \"EmergencyCase_patientId_idx_e5f07e88\" on \"EmergencyCase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "EmergencyCase_patientId_idx_e5f07e88",
+        "table": "EmergencyCase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"EmergencyCase_patientId_idx_e5f07e88\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase_patientId_idx_e5f07e88\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"EmergencyCase_patientId_idx_e5f07e88\"",
+        "sql": "CREATE INDEX \"EmergencyCase_patientId_idx_e5f07e88\" ON \"public\".\"EmergencyCase\" (\"patientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"EmergencyCase_patientId_idx_e5f07e88\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"EmergencyCase_patientId_idx_e5f07e88\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.HospitalCapability.HospitalCapability_hospitalId_idx_94de2e98",
+    "label": "Create index \"HospitalCapability_hospitalId_idx_94de2e98\" on \"HospitalCapability\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "HospitalCapability_hospitalId_idx_94de2e98",
+        "table": "HospitalCapability"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"HospitalCapability_hospitalId_idx_94de2e98\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalCapability_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"HospitalCapability_hospitalId_idx_94de2e98\"",
+        "sql": "CREATE INDEX \"HospitalCapability_hospitalId_idx_94de2e98\" ON \"public\".\"HospitalCapability\" (\"hospitalId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"HospitalCapability_hospitalId_idx_94de2e98\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalCapability_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.HospitalRequest.HospitalRequest_emergencyCaseId_idx_1fa65c28",
+    "label": "Create index \"HospitalRequest_emergencyCaseId_idx_1fa65c28\" on \"HospitalRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "HospitalRequest_emergencyCaseId_idx_1fa65c28",
+        "table": "HospitalRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"HospitalRequest_emergencyCaseId_idx_1fa65c28\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalRequest_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"HospitalRequest_emergencyCaseId_idx_1fa65c28\"",
+        "sql": "CREATE INDEX \"HospitalRequest_emergencyCaseId_idx_1fa65c28\" ON \"public\".\"HospitalRequest\" (\"emergencyCaseId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"HospitalRequest_emergencyCaseId_idx_1fa65c28\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalRequest_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.HospitalRequest.HospitalRequest_hospitalId_idx_94de2e98",
+    "label": "Create index \"HospitalRequest_hospitalId_idx_94de2e98\" on \"HospitalRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "HospitalRequest_hospitalId_idx_94de2e98",
+        "table": "HospitalRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"HospitalRequest_hospitalId_idx_94de2e98\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalRequest_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"HospitalRequest_hospitalId_idx_94de2e98\"",
+        "sql": "CREATE INDEX \"HospitalRequest_hospitalId_idx_94de2e98\" ON \"public\".\"HospitalRequest\" (\"hospitalId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"HospitalRequest_hospitalId_idx_94de2e98\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalRequest_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.HospitalResource.HospitalResource_hospitalId_idx_94de2e98",
+    "label": "Create index \"HospitalResource_hospitalId_idx_94de2e98\" on \"HospitalResource\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "HospitalResource_hospitalId_idx_94de2e98",
+        "table": "HospitalResource"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"HospitalResource_hospitalId_idx_94de2e98\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalResource_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"HospitalResource_hospitalId_idx_94de2e98\"",
+        "sql": "CREATE INDEX \"HospitalResource_hospitalId_idx_94de2e98\" ON \"public\".\"HospitalResource\" (\"hospitalId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"HospitalResource_hospitalId_idx_94de2e98\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"HospitalResource_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.ModelInference.ModelInference_emergencyCaseId_idx_1fa65c28",
+    "label": "Create index \"ModelInference_emergencyCaseId_idx_1fa65c28\" on \"ModelInference\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "ModelInference_emergencyCaseId_idx_1fa65c28",
+        "table": "ModelInference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"ModelInference_emergencyCaseId_idx_1fa65c28\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ModelInference_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"ModelInference_emergencyCaseId_idx_1fa65c28\"",
+        "sql": "CREATE INDEX \"ModelInference_emergencyCaseId_idx_1fa65c28\" ON \"public\".\"ModelInference\" (\"emergencyCaseId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"ModelInference_emergencyCaseId_idx_1fa65c28\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"ModelInference_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Reservation.Reservation_emergencyCaseId_idx_1fa65c28",
+    "label": "Create index \"Reservation_emergencyCaseId_idx_1fa65c28\" on \"Reservation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Reservation_emergencyCaseId_idx_1fa65c28",
+        "table": "Reservation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Reservation_emergencyCaseId_idx_1fa65c28\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Reservation_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Reservation_emergencyCaseId_idx_1fa65c28\"",
+        "sql": "CREATE INDEX \"Reservation_emergencyCaseId_idx_1fa65c28\" ON \"public\".\"Reservation\" (\"emergencyCaseId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Reservation_emergencyCaseId_idx_1fa65c28\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Reservation_emergencyCaseId_idx_1fa65c28\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.Reservation.Reservation_hospitalId_idx_94de2e98",
+    "label": "Create index \"Reservation_hospitalId_idx_94de2e98\" on \"Reservation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "Reservation_hospitalId_idx_94de2e98",
+        "table": "Reservation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"Reservation_hospitalId_idx_94de2e98\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Reservation_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"Reservation_hospitalId_idx_94de2e98\"",
+        "sql": "CREATE INDEX \"Reservation_hospitalId_idx_94de2e98\" ON \"public\".\"Reservation\" (\"hospitalId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"Reservation_hospitalId_idx_94de2e98\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"Reservation_hospitalId_idx_94de2e98\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "index.VitalReading.VitalReading_patientId_idx_e5f07e88",
+    "label": "Create index \"VitalReading_patientId_idx_e5f07e88\" on \"VitalReading\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "index",
+        "name": "VitalReading_patientId_idx_e5f07e88",
+        "table": "VitalReading"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure index \"VitalReading_patientId_idx_e5f07e88\" does not exist",
+        "sql": "SELECT (to_regclass($1)) IS NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VitalReading_patientId_idx_e5f07e88\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "create index \"VitalReading_patientId_idx_e5f07e88\"",
+        "sql": "CREATE INDEX \"VitalReading_patientId_idx_e5f07e88\" ON \"public\".\"VitalReading\" (\"patientId\")",
+        "params": []
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify index \"VitalReading_patientId_idx_e5f07e88\" exists",
+        "sql": "SELECT (to_regclass($1)) IS NOT NULL AS \"result\"",
+        "params": [
+          "\"public\".\"VitalReading_patientId_idx_e5f07e88\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.AuditEvent.AuditEvent_emergencyCaseId_fkey",
+    "label": "Add foreign key \"AuditEvent_emergencyCaseId_fkey\" on \"AuditEvent\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "AuditEvent_emergencyCaseId_fkey",
+        "table": "AuditEvent"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"AuditEvent_emergencyCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "AuditEvent_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"AuditEvent\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"AuditEvent_emergencyCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"AuditEvent\"\nADD CONSTRAINT \"AuditEvent_emergencyCaseId_fkey\"\nFOREIGN KEY (\"emergencyCaseId\")\nREFERENCES \"public\".\"EmergencyCase\" (\"emergencyCaseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"AuditEvent_emergencyCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "AuditEvent_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"AuditEvent\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.EmergencyCase.EmergencyCase_destinationHospitalId_fkey",
+    "label": "Add foreign key \"EmergencyCase_destinationHospitalId_fkey\" on \"EmergencyCase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "EmergencyCase_destinationHospitalId_fkey",
+        "table": "EmergencyCase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"EmergencyCase_destinationHospitalId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmergencyCase_destinationHospitalId_fkey",
+          "public",
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"EmergencyCase_destinationHospitalId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"EmergencyCase\"\nADD CONSTRAINT \"EmergencyCase_destinationHospitalId_fkey\"\nFOREIGN KEY (\"destinationHospitalId\")\nREFERENCES \"public\".\"Hospital\" (\"hospitalId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"EmergencyCase_destinationHospitalId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmergencyCase_destinationHospitalId_fkey",
+          "public",
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.EmergencyCase.EmergencyCase_patientId_fkey",
+    "label": "Add foreign key \"EmergencyCase_patientId_fkey\" on \"EmergencyCase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "EmergencyCase_patientId_fkey",
+        "table": "EmergencyCase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"EmergencyCase_patientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmergencyCase_patientId_fkey",
+          "public",
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"EmergencyCase_patientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"EmergencyCase\"\nADD CONSTRAINT \"EmergencyCase_patientId_fkey\"\nFOREIGN KEY (\"patientId\")\nREFERENCES \"public\".\"Patient\" (\"patientId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"EmergencyCase_patientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmergencyCase_patientId_fkey",
+          "public",
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.EmergencyCase.EmergencyCase_ambulanceId_fkey",
+    "label": "Add foreign key \"EmergencyCase_ambulanceId_fkey\" on \"EmergencyCase\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "EmergencyCase_ambulanceId_fkey",
+        "table": "EmergencyCase"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"EmergencyCase_ambulanceId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmergencyCase_ambulanceId_fkey",
+          "public",
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"EmergencyCase_ambulanceId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"EmergencyCase\"\nADD CONSTRAINT \"EmergencyCase_ambulanceId_fkey\"\nFOREIGN KEY (\"ambulanceId\")\nREFERENCES \"public\".\"Ambulance\" (\"ambulanceId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"EmergencyCase_ambulanceId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "EmergencyCase_ambulanceId_fkey",
+          "public",
+          "\"public\".\"EmergencyCase\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.HospitalCapability.HospitalCapability_hospitalId_fkey",
+    "label": "Add foreign key \"HospitalCapability_hospitalId_fkey\" on \"HospitalCapability\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "HospitalCapability_hospitalId_fkey",
+        "table": "HospitalCapability"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"HospitalCapability_hospitalId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalCapability_hospitalId_fkey",
+          "public",
+          "\"public\".\"HospitalCapability\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"HospitalCapability_hospitalId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"HospitalCapability\"\nADD CONSTRAINT \"HospitalCapability_hospitalId_fkey\"\nFOREIGN KEY (\"hospitalId\")\nREFERENCES \"public\".\"Hospital\" (\"hospitalId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"HospitalCapability_hospitalId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalCapability_hospitalId_fkey",
+          "public",
+          "\"public\".\"HospitalCapability\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.HospitalRequest.HospitalRequest_emergencyCaseId_fkey",
+    "label": "Add foreign key \"HospitalRequest_emergencyCaseId_fkey\" on \"HospitalRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "HospitalRequest_emergencyCaseId_fkey",
+        "table": "HospitalRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"HospitalRequest_emergencyCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalRequest_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"HospitalRequest\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"HospitalRequest_emergencyCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"HospitalRequest\"\nADD CONSTRAINT \"HospitalRequest_emergencyCaseId_fkey\"\nFOREIGN KEY (\"emergencyCaseId\")\nREFERENCES \"public\".\"EmergencyCase\" (\"emergencyCaseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"HospitalRequest_emergencyCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalRequest_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"HospitalRequest\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.HospitalRequest.HospitalRequest_hospitalId_fkey",
+    "label": "Add foreign key \"HospitalRequest_hospitalId_fkey\" on \"HospitalRequest\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "HospitalRequest_hospitalId_fkey",
+        "table": "HospitalRequest"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"HospitalRequest_hospitalId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalRequest_hospitalId_fkey",
+          "public",
+          "\"public\".\"HospitalRequest\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"HospitalRequest_hospitalId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"HospitalRequest\"\nADD CONSTRAINT \"HospitalRequest_hospitalId_fkey\"\nFOREIGN KEY (\"hospitalId\")\nREFERENCES \"public\".\"Hospital\" (\"hospitalId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"HospitalRequest_hospitalId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalRequest_hospitalId_fkey",
+          "public",
+          "\"public\".\"HospitalRequest\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.HospitalResource.HospitalResource_hospitalId_fkey",
+    "label": "Add foreign key \"HospitalResource_hospitalId_fkey\" on \"HospitalResource\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "HospitalResource_hospitalId_fkey",
+        "table": "HospitalResource"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"HospitalResource_hospitalId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalResource_hospitalId_fkey",
+          "public",
+          "\"public\".\"HospitalResource\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"HospitalResource_hospitalId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"HospitalResource\"\nADD CONSTRAINT \"HospitalResource_hospitalId_fkey\"\nFOREIGN KEY (\"hospitalId\")\nREFERENCES \"public\".\"Hospital\" (\"hospitalId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"HospitalResource_hospitalId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "HospitalResource_hospitalId_fkey",
+          "public",
+          "\"public\".\"HospitalResource\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.ModelInference.ModelInference_emergencyCaseId_fkey",
+    "label": "Add foreign key \"ModelInference_emergencyCaseId_fkey\" on \"ModelInference\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "ModelInference_emergencyCaseId_fkey",
+        "table": "ModelInference"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"ModelInference_emergencyCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ModelInference_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"ModelInference\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"ModelInference_emergencyCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"ModelInference\"\nADD CONSTRAINT \"ModelInference_emergencyCaseId_fkey\"\nFOREIGN KEY (\"emergencyCaseId\")\nREFERENCES \"public\".\"EmergencyCase\" (\"emergencyCaseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"ModelInference_emergencyCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "ModelInference_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"ModelInference\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Reservation.Reservation_emergencyCaseId_fkey",
+    "label": "Add foreign key \"Reservation_emergencyCaseId_fkey\" on \"Reservation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Reservation_emergencyCaseId_fkey",
+        "table": "Reservation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Reservation_emergencyCaseId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Reservation_emergencyCaseId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Reservation\"\nADD CONSTRAINT \"Reservation_emergencyCaseId_fkey\"\nFOREIGN KEY (\"emergencyCaseId\")\nREFERENCES \"public\".\"EmergencyCase\" (\"emergencyCaseId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Reservation_emergencyCaseId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_emergencyCaseId_fkey",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Reservation.Reservation_hospitalId_fkey",
+    "label": "Add foreign key \"Reservation_hospitalId_fkey\" on \"Reservation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Reservation_hospitalId_fkey",
+        "table": "Reservation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Reservation_hospitalId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_hospitalId_fkey",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Reservation_hospitalId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Reservation\"\nADD CONSTRAINT \"Reservation_hospitalId_fkey\"\nFOREIGN KEY (\"hospitalId\")\nREFERENCES \"public\".\"Hospital\" (\"hospitalId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Reservation_hospitalId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_hospitalId_fkey",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.Reservation.Reservation_hospitalRequestId_fkey",
+    "label": "Add foreign key \"Reservation_hospitalRequestId_fkey\" on \"Reservation\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "Reservation_hospitalRequestId_fkey",
+        "table": "Reservation"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"Reservation_hospitalRequestId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_hospitalRequestId_fkey",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"Reservation_hospitalRequestId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"Reservation\"\nADD CONSTRAINT \"Reservation_hospitalRequestId_fkey\"\nFOREIGN KEY (\"hospitalRequestId\")\nREFERENCES \"public\".\"HospitalRequest\" (\"hospitalRequestId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"Reservation_hospitalRequestId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "Reservation_hospitalRequestId_fkey",
+          "public",
+          "\"public\".\"Reservation\""
+        ]
+      }
+    ]
+  },
+  {
+    "id": "foreignKey.VitalReading.VitalReading_patientId_fkey",
+    "label": "Add foreign key \"VitalReading_patientId_fkey\" on \"VitalReading\"",
+    "operationClass": "additive",
+    "target": {
+      "id": "postgres",
+      "details": {
+        "schema": "public",
+        "objectType": "foreignKey",
+        "name": "VitalReading_patientId_fkey",
+        "table": "VitalReading"
+      }
+    },
+    "precheck": [
+      {
+        "description": "ensure FK \"VitalReading_patientId_fkey\" does not exist",
+        "sql": "SELECT NOT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "VitalReading_patientId_fkey",
+          "public",
+          "\"public\".\"VitalReading\""
+        ]
+      }
+    ],
+    "execute": [
+      {
+        "description": "add FK \"VitalReading_patientId_fkey\"",
+        "sql": "ALTER TABLE \"public\".\"VitalReading\"\nADD CONSTRAINT \"VitalReading_patientId_fkey\"\nFOREIGN KEY (\"patientId\")\nREFERENCES \"public\".\"Patient\" (\"patientId\")"
+      }
+    ],
+    "postcheck": [
+      {
+        "description": "verify FK \"VitalReading_patientId_fkey\" exists",
+        "sql": "SELECT EXISTS (SELECT 1 AS \"one\" FROM \"pg_constraint\" AS \"c\" INNER JOIN \"pg_namespace\" AS \"n\" ON \"n\".\"oid\" = \"c\".\"connamespace\" WHERE (\"c\".\"conname\" = $1 AND \"n\".\"nspname\" = $2 AND \"c\".\"conrelid\" = to_regclass($3))) AS \"result\"",
+        "params": [
+          "VitalReading_patientId_fkey",
+          "public",
+          "\"public\".\"VitalReading\""
+        ]
+      }
+    ]
+  }
+]

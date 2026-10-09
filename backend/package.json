@@ -11,7 +11,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "@prisma/orm-postgres": "^8.0.0-rc.16",
     "dotenv": "^18.0.6",
