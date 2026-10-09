@@ -39,6 +39,84 @@ res.status(500).json({
 }
 });
 
+
+// Register a new hospital
+app.post("/api/hospitals", async (req, res) => {
+  try {
+    const {
+      name,
+      code,
+      latitude,
+      longitude,
+      address,
+      status,
+      emergencyContact,
+      timezone,
+    } = req.body;
+
+    // Validate required fields
+    if (
+      !name ||
+      !code ||
+      latitude === undefined ||
+      longitude === undefined ||
+      !status ||
+      !timezone
+    ) {
+      res.status(400).json({
+        success: false,
+        message:
+          "Required fields: name, code, latitude, longitude, status, timezone",
+      });
+      return;
+    }
+
+    // Validate coordinates
+    if (
+      typeof latitude !== "number" ||
+      typeof longitude !== "number" ||
+      latitude < -90 ||
+      latitude > 90 ||
+      longitude < -180 ||
+      longitude > 180
+    ) {
+      res.status(400).json({
+        success: false,
+        message: "Invalid latitude or longitude",
+      });
+      return;
+    }
+
+    // Create the hospital
+    const hospital = await db.orm.public.Hospital.create({
+      name,
+      code,
+      latitude,
+      longitude,
+      address: address ?? null,
+      status,
+      emergencyContact: emergencyContact ?? null,
+      timezone,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "Hospital registered successfully",
+      data: hospital,
+    });
+  } catch (error) {
+    console.error("Error registering hospital:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to register hospital",
+    });
+  }
+});
+
+
+
+
 app.listen(PORT, () => {
 console.log(`Server running on http://localhost:${PORT}`);
 });
