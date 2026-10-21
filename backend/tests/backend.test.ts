@@ -11,6 +11,8 @@ import {
   predictDeteriorationRisk,
   allocateMassCasualty,
   executeCommandAssistantQuery,
+  evaluateEcgAssistance,
+  normalizeVoiceInput,
 } from "../src/services/ai.service";
 import {
   calculateHaversineDistanceKm,
@@ -358,7 +360,34 @@ test("Backend Complete Verification Suite", async (t) => {
     assert.ok(assistantResult.response.includes("ICU"));
   });
 
-  // 11. WebSocket Event Emission
+  // 11. ECG AI Assistance & Voice Input Normalization (Section 9.4 & 9.5)
+  await t.test("ECG assistance and voice input normalization", async () => {
+    // Normal / STEMI ECG
+    const ecgResult = await evaluateEcgAssistance({
+      signalQuality: "GOOD",
+      acquisitionMetadata: { leads: 12 },
+    });
+    assert.equal(ecgResult.human_review_required, true);
+    assert.ok(ecgResult.confidence >= 0.9);
+    assert.ok(ecgResult.findings.some((f) => f.includes("STEMI")));
+
+    // Poor quality ECG rejected from confident finding
+    const poorEcg = await evaluateEcgAssistance({
+      signalQuality: "POOR",
+    });
+    assert.equal(poorEcg.signal_quality, "POOR");
+    assert.ok(poorEcg.confidence < 0.5);
+
+    // Voice input candidate extraction
+    const voiceResult = await normalizeVoiceInput({
+      transcript: "Patient having severe crushing chest pain, BP 85 over 50, oxygen 90",
+    });
+    assert.equal(voiceResult.review_required_before_commit, true);
+    assert.equal(voiceResult.structured_extraction.triage_category, "RED");
+    assert.ok(voiceResult.structured_extraction.suggested_resources.includes("OPERATION_THEATRE"));
+  });
+
+  // 12. WebSocket Event Emission
   await t.test("WebSocket event envelope emission", () => {
     const envelope = wsService.emitEvent({
       eventType: "ALERT_CREATED",

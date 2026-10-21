@@ -5,6 +5,8 @@ import {
   forecastCapacity,
   allocateMassCasualty,
   executeCommandAssistantQuery,
+  evaluateEcgAssistance,
+  normalizeVoiceInput,
 } from "../services/ai.service";
 import { AppError } from "../middleware/error.middleware";
 
@@ -120,6 +122,55 @@ export async function commandAssistantHandler(
     }
 
     const result = await executeCommandAssistantQuery(query);
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// POST /api/ai/ecg (Section 9.4)
+export async function ecgAssistanceHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { emergency_case_id, emergencyCaseId, ecg_data, signal_quality, signalQuality, acquisition_metadata, acquisitionMetadata } = req.body;
+
+    const result = await evaluateEcgAssistance({
+      emergencyCaseId: emergencyCaseId || emergency_case_id,
+      ecgDataReference: ecg_data,
+      signalQuality: signalQuality || signal_quality,
+      acquisitionMetadata: acquisitionMetadata || acquisition_metadata,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// POST /api/ai/voice (Section 9.5)
+export async function voiceNormalizationHandler(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const { transcript, audio_reference, audioReference, language } = req.body;
+
+    const result = await normalizeVoiceInput({
+      transcript,
+      audioReference: audioReference || audio_reference,
+      language,
+    });
 
     res.status(200).json({
       success: true,

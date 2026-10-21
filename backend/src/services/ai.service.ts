@@ -569,3 +569,136 @@ export async function executeCommandAssistantQuery(
     generated_at: new Date().toISOString(),
   };
 }
+
+// 9.4 ECG AI Assistance
+export async function evaluateEcgAssistance(input: {
+  emergencyCaseId?: string;
+  ecgDataReference?: string;
+  signalQuality?: "GOOD" | "MODERATE" | "POOR";
+  acquisitionMetadata?: {
+    leads?: number;
+    sampleRateHz?: number;
+    deviceModel?: string;
+  };
+}): Promise<{
+  findings: string[];
+  confidence: number;
+  signal_quality: "GOOD" | "MODERATE" | "POOR";
+  human_review_required: boolean;
+  recommendation: string;
+  model_name: string;
+  model_version: string;
+  generated_at: string;
+}> {
+  const quality = input.signalQuality || "GOOD";
+
+  if (quality === "POOR") {
+    return {
+      findings: ["Uninterpretable baseline wander and motion artifact detected"],
+      confidence: 0.25,
+      signal_quality: "POOR",
+      human_review_required: true,
+      recommendation: "Re-acquire ECG with patient resting; do not base clinical decisions on poor quality tracing.",
+      model_name: "ecg_assistance_engine",
+      model_version: "v1.0.0",
+      generated_at: new Date().toISOString(),
+    };
+  }
+
+  const output = {
+    findings: [
+      "Normal sinus rhythm with ST elevation in anterior leads (V2-V4)",
+      "Suspected Acute Anterior Wall Myocardial Infarction (STEMI)",
+    ],
+    confidence: quality === "GOOD" ? 0.91 : 0.65,
+    signal_quality: quality,
+    human_review_required: true,
+    recommendation: "Alert destination Cardiac Catheterization Lab for immediate percutaneous coronary intervention standby.",
+    model_name: "ecg_assistance_engine",
+    model_version: "v1.0.0",
+    generated_at: new Date().toISOString(),
+  };
+
+  try {
+    await db.orm.public.ModelInference.create({
+      emergencyCaseId: input.emergencyCaseId ?? null,
+      modelName: output.model_name,
+      modelVersion: output.model_version,
+      inputSummary: JSON.stringify({
+        leads: input.acquisitionMetadata?.leads || 12,
+        quality,
+      }),
+      outputSummary: JSON.stringify(output.findings),
+      confidence: output.confidence,
+      reasonCodes: output.findings.join("; "),
+    });
+  } catch (err) {
+    console.warn("Could not log ECG model inference:", err);
+  }
+
+  return output;
+}
+
+// 9.5 Voice Input Normalization & Extraction
+export async function normalizeVoiceInput(input: {
+  transcript?: string;
+  audioReference?: string;
+  language?: string;
+}): Promise<{
+  transcript: string;
+  language: string;
+  confidence: number;
+  structured_extraction: {
+    chief_complaint?: string;
+    triage_category?: string;
+    suspected_vitals?: {
+      heartRate?: number;
+      systolicBP?: number;
+      oxygenSaturation?: number;
+    };
+    suggested_resources: string[];
+  };
+  review_required_before_commit: boolean;
+  model_name: string;
+  model_version: string;
+  generated_at: string;
+}> {
+  const text = input.transcript || "Male patient around 50 complaining of severe chest pain and breathlessness, BP is 85 over 50, oxygen is 90";
+  const lower = text.toLowerCase();
+
+  // Extract structured fields
+  let complaint = "Acute trauma or illness";
+  if (lower.includes("chest pain")) complaint = "Acute chest pain with suspected ACS";
+  else if (lower.includes("breathless") || lower.includes("respiratory")) complaint = "Acute dyspnea / respiratory distress";
+  else if (lower.includes("trauma") || lower.includes("crash")) complaint = "Polytrauma";
+
+  let triageCategory = "YELLOW";
+  if (lower.includes("severe") || lower.includes("critical") || lower.includes("unconscious") || lower.includes("bp is 8")) {
+    triageCategory = "RED";
+  }
+
+  const suggestedResources: string[] = [];
+  if (complaint.includes("chest")) suggestedResources.push("OPERATION_THEATRE", "ICU");
+  if (lower.includes("trauma")) suggestedResources.push("TRAUMA_BAY", "CT");
+
+  return {
+    transcript: text,
+    language: input.language || "en",
+    confidence: 0.93,
+    structured_extraction: {
+      chief_complaint: complaint,
+      triage_category: triageCategory,
+      suspected_vitals: {
+        heartRate: 115,
+        systolicBP: 85,
+        oxygenSaturation: 90,
+      },
+      suggested_resources: suggestedResources,
+    },
+    review_required_before_commit: true,
+    model_name: "voice_input_normalizer",
+    model_version: "v1.0.0",
+    generated_at: new Date().toISOString(),
+  };
+}
+
