@@ -1,17 +1,25 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import {
   getAllHospitals,
   getHospitalById,
   createHospital,
+  getHospitalResources,
+  updateHospitalResources,
+  getHospitalCapabilities,
+  updateHospitalCapabilities,
 } from "../services/hospital.service";
+import { forecastCapacity } from "../services/ai.service";
+import { AppError } from "../middleware/error.middleware";
 
 // GET /api/hospitals
 export async function listHospitals(
   req: Request,
   res: Response,
+  next: NextFunction
 ): Promise<void> {
   try {
-    const hospitals = await getAllHospitals();
+    const status = req.query.status as string | undefined;
+    const hospitals = await getAllHospitals({ status });
 
     res.status(200).json({
       success: true,
@@ -19,12 +27,7 @@ export async function listHospitals(
       data: hospitals,
     });
   } catch (error) {
-    console.error("Error fetching hospitals:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch hospitals",
-    });
+    next(error);
   }
 }
 
@@ -32,26 +35,19 @@ export async function listHospitals(
 export async function getHospital(
   req: Request,
   res: Response,
+  next: NextFunction
 ): Promise<void> {
   try {
     const hospitalId = String(req.params.hospitalId ?? "");
 
     if (!hospitalId) {
-      res.status(400).json({
-        success: false,
-        message: "Hospital ID is required",
-      });
-      return;
+      throw new AppError(400, "MISSING_PARAM", "Hospital ID is required");
     }
 
     const hospital = await getHospitalById(hospitalId);
 
     if (!hospital) {
-      res.status(404).json({
-        success: false,
-        message: "Hospital not found",
-      });
-      return;
+      throw new AppError(404, "HOSPITAL_NOT_FOUND", "Hospital not found");
     }
 
     res.status(200).json({
@@ -59,12 +55,7 @@ export async function getHospital(
       data: hospital,
     });
   } catch (error) {
-    console.error("Error fetching hospital:", error);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch hospital",
-    });
+    next(error);
   }
 }
 
@@ -72,6 +63,7 @@ export async function getHospital(
 export async function registerHospital(
   req: Request,
   res: Response,
+  next: NextFunction
 ): Promise<void> {
   try {
     const {
@@ -93,12 +85,11 @@ export async function registerHospital(
       !status ||
       !timezone
     ) {
-      res.status(400).json({
-        success: false,
-        message:
-          "Required fields: name, code, latitude, longitude, status, timezone",
-      });
-      return;
+      throw new AppError(
+        400,
+        "VALIDATION_ERROR",
+        "Required fields: name, code, latitude, longitude, status, timezone"
+      );
     }
 
     if (
@@ -109,11 +100,7 @@ export async function registerHospital(
       longitude < -180 ||
       longitude > 180
     ) {
-      res.status(400).json({
-        success: false,
-        message: "Invalid latitude or longitude",
-      });
-      return;
+      throw new AppError(400, "INVALID_COORDINATES", "Invalid latitude or longitude");
     }
 
     const hospital = await createHospital({
@@ -133,11 +120,137 @@ export async function registerHospital(
       data: hospital,
     });
   } catch (error) {
-    console.error("Error registering hospital:", error);
+    next(error);
+  }
+}
 
-    res.status(500).json({
-      success: false,
-      message: "Failed to register hospital",
+// GET /api/hospitals/:hospitalId/resources
+export async function getResources(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const hospitalId = String(req.params.hospitalId);
+    const resources = await getHospitalResources(hospitalId);
+
+    res.status(200).json({
+      success: true,
+      hospital_id: hospitalId,
+      count: resources.length,
+      data: resources,
     });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// PUT /api/hospitals/:hospitalId/resources
+export async function updateResources(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const hospitalId = String(req.params.hospitalId);
+    const resources = req.body.resources || req.body;
+
+    if (!Array.isArray(resources)) {
+      throw new AppError(
+        400,
+        "INVALID_PAYLOAD",
+        "Payload must be an array of resources or { resources: [...] }"
+      );
+    }
+
+    const updated = await updateHospitalResources(
+      hospitalId,
+      resources,
+      req.correlationId
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Hospital resources updated successfully",
+      hospital_id: hospitalId,
+      count: updated.length,
+      data: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// GET /api/hospitals/:hospitalId/capabilities
+export async function getCapabilities(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const hospitalId = String(req.params.hospitalId);
+    const capabilities = await getHospitalCapabilities(hospitalId);
+
+    res.status(200).json({
+      success: true,
+      hospital_id: hospitalId,
+      count: capabilities.length,
+      data: capabilities,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// PUT / POST /api/hospitals/:hospitalId/capabilities
+export async function updateCapabilities(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const hospitalId = String(req.params.hospitalId);
+    const capabilities = req.body.capabilities || req.body;
+
+    if (!Array.isArray(capabilities)) {
+      throw new AppError(
+        400,
+        "INVALID_PAYLOAD",
+        "Payload must be an array of capabilities"
+      );
+    }
+
+    const updated = await updateHospitalCapabilities(hospitalId, capabilities);
+
+    res.status(200).json({
+      success: true,
+      message: "Hospital capabilities updated successfully",
+      hospital_id: hospitalId,
+      count: updated.length,
+      data: updated,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// GET /api/hospitals/:hospitalId/resources/forecast
+export async function getForecast(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> {
+  try {
+    const hospitalId = String(req.params.hospitalId);
+    const resourceType = (req.query.type as string) || "ICU";
+
+    const forecast = await forecastCapacity(hospitalId, resourceType);
+
+    res.status(200).json({
+      success: true,
+      data: forecast,
+    });
+  } catch (error) {
+    next(error);
   }
 }
